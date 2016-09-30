@@ -13,14 +13,42 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
 
+    cursor.execute('DELETE FROM matches;')
+    dbCon.commit()
+    dbCon.close()
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
+
+    cursor.execute('DELETE FROM players;')
+    dbCon.commit()
+    dbCon.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
+
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
+    # use coalesce to transform NULL into 0 in the case of no records in the
+    # players table
+    cursor.execute('SELECT COALESCE((SELECT COUNT(*) FROM players), 0);')
+    # aggregate query so we are expecting only 1 result row
+    numPlayers = cursor.fetchone()
+    dbCon.close()
+    
+    return numPlayers[0]
 
 
 def registerPlayer(name):
