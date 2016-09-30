@@ -94,7 +94,6 @@ def playerStandings():
     cursor.execute('SELECT * FROM standings;')
     standings = cursor.fetchall()
     dbCon.close()
-    print(standings)
     return standings
     
 
@@ -106,6 +105,14 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
+
+    # insert the winner and loser ids into the matches table
+    cursor.execute('INSERT INTO matches (winner_id, loser_id) VALUES(%s, %s);', (winner, loser))
+    dbCon.commit()
+    dbCon.close()
  
  
 def swissPairings():
