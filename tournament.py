@@ -60,7 +60,18 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
 
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
+
+    # ID is type SERIAL so just need to insert the name
+    cursor.execute('INSERT INTO players (name) VALUES(%s);', (name,))
+    dbCon.commit()
+    dbCon.close()
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
