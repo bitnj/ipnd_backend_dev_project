@@ -18,3 +18,16 @@ CREATE TABLE matches (
     id SERIAL,
     winner_id INTEGER REFERENCES players (id),
     loser_id INTEGER REFERENCES players (id));
+
+-- Create a view to show the current standings.  All registered players must be
+-- in the standings regardless of whether any matches have been played
+CREATE OR REPLACE VIEW standings (id, name, wins, played) AS 
+SELECT players.id, players.name,
+    SUM (CASE WHEN players.id = matches.winner_id then 1 else 0 end) as wins,
+    COUNT(matches.id) as played
+    FROM players
+    LEFT JOIN matches ON
+    players.id IN (matches.winner_id, matches.loser_id)
+    GROUP BY players.id
+    ORDER BY wins DESC;
+

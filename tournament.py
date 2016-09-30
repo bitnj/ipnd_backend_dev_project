@@ -86,6 +86,17 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
+
+    # retrieve the records from the VIEW standings
+    cursor.execute('SELECT * FROM standings;')
+    standings = cursor.fetchall()
+    dbCon.close()
+    print(standings)
+    return standings
+    
 
 
 def reportMatch(winner, loser):
