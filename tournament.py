@@ -21,6 +21,7 @@ def deleteMatches():
     dbCon.commit()
     dbCon.close()
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
     # connect to the database and get a cursor
@@ -73,6 +74,7 @@ def registerPlayer(name):
     dbCon.commit()
     dbCon.close()
 
+
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
@@ -96,7 +98,6 @@ def playerStandings():
     dbCon.close()
     return standings
     
-
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.

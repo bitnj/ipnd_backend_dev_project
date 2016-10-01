@@ -2,7 +2,6 @@
 -- Since we are using this file to repeatedly refine our schema we will DROP the
 -- database or any table and recreate it each time this file is run.
 
-
 -- Create the tournament database and connect to it
 DROP DATABASE IF EXISTS tournament;
 CREATE DATABASE tournament;
