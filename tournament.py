@@ -130,5 +130,21 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    # connect to the database and get a cursor
+    dbCon = connect()
+    cursor = dbCon.cursor()
 
+    # first get the standings VIEW
+    standings = playerStandings()
+    
+    # get the id and name of each player in the standings
+    players = [player_info[0:2] for player_info in standings]
+    # init pairings list
+    pairings = []
+    # loop through the players in 2s and add the player info for adjacent
+    # players into a tuple
+    for i in range(0, len(standings) - 1, 2):
+        pair = (players[i] + players[i+1])
+        pairings.append(pair)
+    return pairings
 
