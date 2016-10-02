@@ -4,7 +4,7 @@
 #
 
 import psycopg2
-
+from contextlib import contextmanager
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -15,39 +15,44 @@ def connect():
         # exception but in this case not terrible
         print('Connection Failed')
 
+@contextmanager
+def get_cursor():
+    """Helper function that creates a cursor from a database connection object,
+    and performs queries using that cursor.  Implemented based on reviewer
+    feedback"""
+    DB = connect()
+    cursor = DB.cursor()
+    try:
+        yield cursor
+    except:
+        raise
+    else:
+        DB.commit()
+    finally:
+        cursor.close()
+        DB.close()
+
+
 def deleteMatches():
     """Remove all the match records from the database."""
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
-    cursor.execute('DELETE FROM matches;')
-    dbCon.commit()
-    dbCon.close()
+    with get_cursor() as cursor:
+        cursor.execute('DELETE FROM matches;')
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
-    cursor.execute('DELETE FROM players;')
-    dbCon.commit()
-    dbCon.close()
+    with get_cursor() as cursor:
+        cursor.execute('DELETE FROM players;')
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
     # use coalesce to transform NULL into 0 in the case of no records in the
     # players table
-    cursor.execute('SELECT COALESCE((SELECT COUNT(*) FROM players), 0);')
-    # aggregate query so we are expecting only 1 result row
-    numPlayers = cursor.fetchone()
-    dbCon.close()
+    with get_cursor() as cursor:
+        cursor.execute('SELECT COALESCE((SELECT COUNT(*) FROM players), 0);')
+        # aggregate query so we are expecting only 1 result row
+        numPlayers = cursor.fetchone()
     
     return numPlayers[0]
 
@@ -61,18 +66,9 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
-    # ID is type SERIAL so just need to insert the name
-    cursor.execute('INSERT INTO players (name) VALUES(%s);', (name,))
-    dbCon.commit()
-    dbCon.close()
+    with get_cursor() as cursor:
+        # ID is type SERIAL so just need to insert the name
+        cursor.execute('INSERT INTO players (name) VALUES(%s);', (name,))
 
 
 def playerStandings():
@@ -88,14 +84,11 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
-    # retrieve the records from the VIEW standings
-    cursor.execute('SELECT * FROM standings;')
-    standings = cursor.fetchall()
-    dbCon.close()
+    with get_cursor() as cursor:
+        # retrieve the records from the VIEW standings
+        cursor.execute('SELECT * FROM standings;')
+        standings = cursor.fetchall()
+    
     return standings
     
 
@@ -106,14 +99,9 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
-    # insert the winner and loser ids into the matches table
-    cursor.execute('INSERT INTO matches (winner_id, loser_id) VALUES(%s, %s);', (winner, loser))
-    dbCon.commit()
-    dbCon.close()
+    with get_cursor() as cursor:
+        # insert the winner and loser ids into the matches table
+        cursor.execute('INSERT INTO matches (winner_id, loser_id) VALUES(%s, %s);', (winner, loser))
  
  
 def swissPairings():
@@ -131,10 +119,6 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
     # first get the standings VIEW
     standings = playerStandings()
     
