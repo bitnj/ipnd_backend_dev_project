@@ -40,5 +40,7 @@ PDF of the specification is included in this repository
 
 ## Running the project
 1. import the tournament.sql file into PostgreSQL
+    * from the command line type: psql -f tournament.sql
 2. from the same directory run the tournament_test.py
+    * from the command line type: python tournament_test.py
 
