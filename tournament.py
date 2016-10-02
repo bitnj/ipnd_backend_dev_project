@@ -8,8 +8,12 @@ import psycopg2
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
-
+    try:
+        return psycopg2.connect("dbname=tournament")
+    except:
+        # per Udacity reviewer it's generally not good practice to exclude the
+        # exception but in this case not terrible
+        print('Connection Failed')
 
 def deleteMatches():
     """Remove all the match records from the database."""
@@ -35,10 +39,6 @@ def deletePlayers():
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    # connect to the database and get a cursor
-    dbCon = connect()
-    cursor = dbCon.cursor()
-
     # connect to the database and get a cursor
     dbCon = connect()
     cursor = dbCon.cursor()
